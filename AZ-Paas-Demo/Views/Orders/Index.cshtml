@@ -1,0 +1,34 @@
+﻿@model List<AZ_Paas_Demo.Data.Models.Orders>
+@{
+    ViewData["Title"] = "Orders";
+}
+
+
+<h2>Here are your orders:</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="col-xs-2">Order date</th>
+            <th class="col-xs-1"># order lines</th>
+            <th class="col-xs-1">Total price</th>
+            <th class="col-xs-2">Status</th>
+            <th class="col-xs-2"></th>
+            <th class="col-xs-2"></th>
+            <th class="col-xs-2"></th>
+        </tr>
+    </thead>
+    @foreach (var order in Model)
+    {
+        
+        <tr>
+            <td>@order.Date.Value.ToLocalTime().ToString("d")</td>
+            <td>@order.OrderLines.Count</td>
+            <td>$ @order.Price.Value.ToString(System.Globalization.CultureInfo.CurrentCulture)</td>
+            <td>@order.Status</td>
+            <td><a href="Orders/Detail?id=@order.Id">Details</a></td>
+            <td><a href="Orders/CancelOrder?id=@order.Id">Cancel order</a></td>
+            <td><a href="Orders/PlaceOrder?id=@order.Id">Place order</a></td>            
+        </tr>
+    }
+</table>

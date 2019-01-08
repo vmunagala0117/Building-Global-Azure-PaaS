@@ -1,0 +1,104 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "azpaasdemoAdminLogin": {
+      "type": "string",
+      "minLength": 1
+    },
+    "azpaasdemoAdminLoginPassword": {
+      "type": "securestring"
+    },
+    "azpaasdemo-dbName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "azpaasdemo-dbRegion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "azpaasdemo-dbCollation": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+    },
+    "azpaasdemo-dbEdition": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium"
+      ]
+    },
+    "azpaasdemo-dbRequestedServiceObjectiveName": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "S0",
+        "S1",
+        "S2",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "metadata": {
+        "description": "Describes the performance level for Edition"
+      }
+    }
+  },
+  "variables": {
+    //"azpaasdemoName": "[concat('azpaasdemosqlserver', uniqueString(resourceGroup().id))]"
+    "azpaasdemoName": "[concat('azpaasdemosqlserver', toLower(replace(parameters('azpaasdemo-dbRegion'),' ','')))]"
+  },
+  "resources": [
+    {
+      "name": "[variables('azpaasdemoName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[parameters('azpaasdemo-dbRegion')]",
+      "apiVersion": "2014-04-01-preview",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "azpaasdemo"
+      },
+      "properties": {
+        "administratorLogin": "[parameters('azpaasdemoAdminLogin')]",
+        "administratorLoginPassword": "[parameters('azpaasdemoAdminLoginPassword')]"
+      },
+      "resources": [
+        {
+          "name": "AllowAllWindowsAzureIps",
+          "type": "firewallrules",
+          "location": "[parameters('azpaasdemo-dbRegion')]",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('azpaasdemoName'))]"
+          ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "name": "[parameters('azpaasdemo-dbName')]",
+          "type": "databases",
+          "location": "[parameters('azpaasdemo-dbRegion')]",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('azpaasdemoName'))]"
+          ],
+          "tags": {
+            "displayName": "azpaasdemo-db"
+          },
+          "properties": {
+            "collation": "[parameters('azpaasdemo-dbCollation')]",
+            "edition": "[parameters('azpaasdemo-dbEdition')]",
+            "maxSizeBytes": "1073741824",
+            "requestedServiceObjectiveName": "[parameters('azpaasdemo-dbRequestedServiceObjectiveName')]"
+          }
+        }
+      ]
+    }],
+  "outputs": {}
+}

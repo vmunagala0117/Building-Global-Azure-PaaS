@@ -1,0 +1,48 @@
+﻿@model AZ_Paas_Demo.Data.Models.Orders
+@{
+    ViewData["Title"] = "Order detail";
+}
+
+@if (Model == null)
+{
+
+    <h2>No order was found.</h2>
+}
+else
+{
+
+    <h2>Details for order with Id @Model.Id</h2>
+
+    <fieldset>
+        <legend>Order</legend>
+        Date: @Model.Date.Value.LocalDateTime.ToString("d") <br />
+        Total Price: $ @Model.Price.Value.ToString(System.Globalization.CultureInfo.CurrentCulture) <br />
+        Status: @Model.Status <br />
+        @if (@Model.Status != "Placed")
+        {
+            <a href="PlaceOrder?id=@Model.Id">Place order</a><br />
+        }
+
+
+        <a href="CancelOrder?id=@Model.Id">Cancel order</a>
+
+    </fieldset>
+
+    <h3>Order lines:</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <td class="col-md-3">Juice name</td>
+                <td class="col-md-3"># juices</td>
+            </tr>
+        </thead>
+        @foreach (var line in Model.OrderLines)
+        {
+            <tr>
+                <td>@line.Juice.Name</td>
+                <td>@line.Quantity</td>
+            </tr>
+        }
+
+    </table>
+}

@@ -1,0 +1,32 @@
+﻿@model List<AZ_Paas_Demo.Data.Models.Juices>
+@{
+    ViewData["Title"] = "Juices";
+}
+
+<h2>Check out the awesome juices:</h2>
+
+@for (int i = 0; i < Model.Count; i++)
+{
+    if (i == 0)
+    {
+        @:<div class="row">
+        }
+        <form action="/Orders/AddJuiceToOrderLine" id="AddJuiceToOrderLine@@@i">
+         <input type="hidden" value="@Model[i].Id" name="juiceId" id="juiceId" />
+            <div class="col-md-2">
+                <p>
+                    <strong>@Model[i].Name</strong>
+                </p>
+                <p>
+                    <img src="@Model[i].ImageUrl" alt="@Model[i].Name" width="110" height="110" />
+                </p>
+                <p>
+                    $ @Model[i].Price.Value.ToString(System.Globalization.CultureInfo.CurrentCulture) /glass
+                </p>
+                <p>
+                    <button type="submit">Add to Order</button>
+                </p>
+            </div>
+</form>
+    }
+
