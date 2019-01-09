@@ -46,6 +46,45 @@
       "metadata": {
         "description": "Describes the performance level for Edition"
       }
+    },
+    "vpaasdemo-cacheName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "vpaasdemo-cacheSKUName": {
+      "type": "string",
+      "allowedValues": [
+        "Basic",
+        "Standard"
+      ],
+      "defaultValue": "Standard"
+    },
+    "vpaasdemo-cacheSKUFamily": {
+      "type": "string",
+      "allowedValues": [
+        "C"
+      ],
+      "defaultValue": "C"
+    },
+    "vpaasdemo-cacheSKUCapacity": {
+      "type": "int",
+      "allowedValues": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "defaultValue": 0
+    },
+    "vpaasdemo-cacheRedisVersion": {
+      "type": "string",
+      "allowedValues": [
+        "2.8"
+      ],
+      "defaultValue": "2.8"
     }
   },
   "variables": {
@@ -99,6 +138,24 @@
           }
         }
       ]
+    },
+    {
+      "name": "[parameters('vpaasdemo-cacheName')]",
+      "type": "Microsoft.Cache/Redis",
+      "location": "[parameters('azpaasdemo-dbRegion')]",
+      "apiVersion": "2016-04-01",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "vpaasdemo-cache"
+      },
+      "properties": {
+        "sku": {
+          "name": "[parameters('vpaasdemo-cacheSKUName')]",
+          "family": "[parameters('vpaasdemo-cacheSKUFamily')]",
+          "capacity": "[parameters('vpaasdemo-cacheSKUCapacity')]"
+        },
+        "redisVersion": "[parameters('vpaasdemo-cacheRedisVersion')]"
+      }
     }],
   "outputs": {}
 }

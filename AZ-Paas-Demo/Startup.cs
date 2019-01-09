@@ -30,6 +30,13 @@ namespace AZ_Paas_Demo
         {
             services.AddDbContext<azpaasdemodbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("JuiceDBConnection")));
 
+            //add Redis Cache Service
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetConnectionString("RedisCacheConnection");
+                options.InstanceName = "master";
+            });
+
             services.AddTransient<IStoreService, StoreService>();
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<IJuiceService, JuiceService>();
