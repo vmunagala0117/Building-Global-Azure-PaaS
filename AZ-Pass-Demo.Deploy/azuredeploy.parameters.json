@@ -6,13 +6,13 @@
       "value": "vamsi.munagala"
     },
     "azpaasdemo-dbName": {
-      "value": "azpaasdemo-db-eastus"
+      "value": "azpaasdemo-db-india"
     },
     "azpaasdemo-dbRegion": {
-      "value": "East US"
+      "value": "South India"
     },
     "vpaasdemo-cacheName": {
-      "value": "vpaasdemo-cache-eastus"
+      "value": "vpaasdemo-cache-india"
     }
   }
 }
