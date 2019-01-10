@@ -18,7 +18,7 @@ namespace AZ_Paas_Demo.Controllers
         }
         public IActionResult Index()
         {
-            ViewData["Region"] = _Configuration.GetValue<string>("Data:Region");
+            ViewData["Region"] = _Configuration.GetValue<string>("Region");
             return View();
         }
 

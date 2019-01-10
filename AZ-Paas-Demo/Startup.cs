@@ -28,12 +28,12 @@ namespace AZ_Paas_Demo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<azpaasdemodbContext>(options => options.UseSqlServer(Configuration.GetSection("Data").GetConnectionString("JuiceDBConnection")));
+            services.AddDbContext<azpaasdemodbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("JuiceDBConnection")));
 
             //add Redis Cache Service
             services.AddDistributedRedisCache(options =>
             {
-                options.Configuration = Configuration.GetSection("Data").GetConnectionString("RedisCacheConnection");
+                options.Configuration = Configuration.GetConnectionString("RedisCacheConnection");
                 options.InstanceName = "master";
             });
 
