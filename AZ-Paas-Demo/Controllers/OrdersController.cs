@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AZ_Paas_Demo.Data.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AZ_Paas_Demo.Controllers
 {
-
+    [Authorize]
     public class OrdersController : Controller
     {
         private IOrderService _orderService;

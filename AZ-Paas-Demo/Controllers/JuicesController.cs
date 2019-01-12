@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using AZ_Paas_Demo.Data.Interfaces;
 using AZ_Paas_Demo.Data.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AZ_Paas_Demo.Controllers
 {
+    [Authorize]
     public class JuicesController : Controller
     {
         private Stores _store;

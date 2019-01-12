@@ -13,6 +13,8 @@ using AZ_Paas_Demo.Data;
 using Microsoft.EntityFrameworkCore;
 using AZ_Paas_Demo.Data.Interfaces;
 using AZ_Paas_Demo.Data.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace AZ_Paas_Demo
 {
@@ -50,6 +52,20 @@ namespace AZ_Paas_Demo
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            //so when a user is authenticated, he will carry a cookie on his machine to authenticate his request with.
+            //also instantiated OpenId middleware and pass the parameters from the appsettings.json file
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            }).AddCookie()
+            .AddOpenIdConnect(options =>
+            {
+                options.Authority = string.Format(Configuration["AzureAd:AadInstance"], Configuration["AzureAd:TenantId"]);
+                options.ClientId = Configuration["AzureAd:ClientId"];
+                options.CallbackPath = Configuration["AzureAd:AuthCallback"];
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,7 +80,7 @@ namespace AZ_Paas_Demo
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
