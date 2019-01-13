@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AZ_Paas_Demo.Data.Interfaces;
+using AZ_Paas_Demo.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Security.Claims;
 
 namespace AZ_Paas_Demo.Controllers
 {
@@ -12,17 +15,22 @@ namespace AZ_Paas_Demo.Controllers
     public class OrdersController : Controller
     {
         private IOrderService _orderService;
-        //private IDistributedCache _cache;
-        private int _storeId = 1;
-        public OrdersController(IOrderService orderService/*, IDistributedCache cache*/)
+        private IDistributedCache _cache;
+        private int _storeId;
+        public OrdersController(IOrderService orderService, IDistributedCache cache)
         {
             _orderService = orderService;
-            //_cache = cache;
+            _cache = cache;
         }
         public IActionResult Index()
         {
-            var orders = _orderService.GetAllOrders(_storeId);
+            List<Orders> orders = new List<Orders>();
+            if (int.TryParse(_cache.GetString(User.Identity.Name), out _storeId))
+            {
+                orders = _orderService.GetAllOrders(_storeId);
+            }
             return View(orders);
+
         }
         public IActionResult Detail(int id)
         {

@@ -13,14 +13,13 @@ namespace AZ_Paas_Demo.ViewComponents
     {
         //private IAccountService _accountService;
         private IDistributedCache _cache;
+        private IAccountService _accountService;
 
-        
-        public UserViewComponent(/*IAccountService accountService, */IDistributedCache cache)
+        public UserViewComponent(IAccountService accountService, IDistributedCache cache)
         {
             _cache = cache;
-            //_accountService = accountService;
-        }
-        
+            _accountService = accountService;
+        }        
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
@@ -31,12 +30,10 @@ namespace AZ_Paas_Demo.ViewComponents
                     ClaimsIdentity user = (ClaimsIdentity)User.Identity;
                     string userId = user.Claims.First(c => c.Type == "http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
 
-                    //Guid storeId = await _accountService.GetStoreIdFromUser(userId);
-
-                    //_cache.SetString(User.Identity.Name, storeId.ToString());
+                    int storeId = await _accountService.GetStoreIdFromUser(userId);
+                    _cache.SetString(User.Identity.Name, storeId.ToString());
                 }
             }
-
             return View();
         }
     }

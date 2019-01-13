@@ -22,12 +22,10 @@ namespace AZ_Paas_Demo.Data.Services
             _adSettings = adSettings.Value;
         }
 
-        public async Task<Guid> GetStoreIdFromUser(string userId)
+        public async Task<int> GetStoreIdFromUser(string userId)
         {
-            Guid storeId = new Guid();
-
+            int storeId = -1;
             string accessToken = await GetBearerAccesToken();
-
             using (var client = new HttpClient())
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, GetUserUrl(userId)))
@@ -39,18 +37,17 @@ namespace AZ_Paas_Demo.Data.Services
                         if (response.StatusCode == HttpStatusCode.OK)
                         {
                             var json = JObject.Parse(await response.Content.ReadAsStringAsync());
-                            storeId = Guid.Parse(json?["physicalDeliveryOfficeName"]?.ToString());
+                            storeId = int.Parse(json?["officeLocation"]?.ToString());
                         }
                     }
                 }
             }
-
             return storeId;
         }
 
         private string GetUserUrl(string userPrincipalName)
         {
-            return string.Format("https://graph.windows.net/{0}/users/{1}?{2}", _adSettings.TenantId, userPrincipalName, "api-version=1.6");
+            return string.Format("https://graph.microsoft.com/v1.0/users/{0}", userPrincipalName);        
         }
 
         private async Task<string> GetBearerAccesToken()
@@ -64,12 +61,13 @@ namespace AZ_Paas_Demo.Data.Services
 
             // Config for OAuth client credentials  
             ClientCredential clientCred = new ClientCredential(_adSettings.ClientId, _adSettings.AppKey);
-            string resource = "https://graph.windows.net";
+            string resource = "https://graph.microsoft.com"; //Microsoft Graph API
 
             AuthenticationResult authenticationResult = await authenticationContext.AcquireTokenAsync(resource, clientCred);
             result = authenticationResult.AccessToken;
 
             return result;
         }
+
     }
 }

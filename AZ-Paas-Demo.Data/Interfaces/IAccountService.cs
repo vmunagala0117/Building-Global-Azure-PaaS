@@ -7,6 +7,6 @@ namespace AZ_Paas_Demo.Data.Interfaces
 {
     public interface IAccountService
     {
-        Task<Guid> GetStoreIdFromUser(string userId);
+        Task<int> GetStoreIdFromUser(string userId);
     }
 }

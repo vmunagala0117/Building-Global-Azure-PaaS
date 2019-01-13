@@ -11,6 +11,5 @@ namespace AZ_Paas_Demo.Data.Models
         public string ClientId { get; set; }
 
         public string AppKey { get; set; }
-
     }
 }

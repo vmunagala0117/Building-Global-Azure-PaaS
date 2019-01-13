@@ -15,6 +15,7 @@ using AZ_Paas_Demo.Data.Interfaces;
 using AZ_Paas_Demo.Data.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using AZ_Paas_Demo.Data.Models;
 
 namespace AZ_Paas_Demo
 {
@@ -30,6 +31,7 @@ namespace AZ_Paas_Demo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<AzureAd>(Configuration.GetSection("AzureAd"));
             services.AddDbContext<azpaasdemodbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("JuiceDBConnection")));
 
             //add Redis Cache Service
@@ -42,6 +44,7 @@ namespace AZ_Paas_Demo
             services.AddTransient<IStoreService, StoreService>();
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<IJuiceService, JuiceService>();
+            services.AddTransient<IAccountService, AccountService>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {

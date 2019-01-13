@@ -25,8 +25,8 @@ namespace AZ_Paas_Demo.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-            #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=tcp:azpaasdemosqlserversouthindia.database.windows.net,1433;Initial Catalog=azpaasdemo-db-india;Persist Security Info=False;User ID=vamsi.munagala;Password=Mun@g@l@1984;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+                #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseSqlServer("<insert db connection string>");
             }
         }
 
