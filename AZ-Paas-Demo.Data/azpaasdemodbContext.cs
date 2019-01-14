@@ -15,7 +15,7 @@ namespace AZ_Paas_Demo.Data
             : base(options)
         {
         }
-
+        public virtual DbSet<DatabaseServers> DatabaseServers { get; set; }
         public virtual DbSet<Juices> Juices { get; set; }
         public virtual DbSet<OrderLines> OrderLines { get; set; }
         public virtual DbSet<Orders> Orders { get; set; }
@@ -32,6 +32,19 @@ namespace AZ_Paas_Demo.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<DatabaseServers>(entity =>
+            {
+                entity.Property(e => e.DatabaseName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatabaseServer).IsUnicode(false);
+
+                entity.Property(e => e.Region)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<Juices>(entity =>
             {
                 entity.Property(e => e.Name)
@@ -72,6 +85,11 @@ namespace AZ_Paas_Demo.Data
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.DatabaseServer)
+                    .WithMany(p => p.Stores)
+                    .HasForeignKey(d => d.DatabaseServerId)
+                    .HasConstraintName("FK_Stores_DatabaseServers");
             });
         }
     }

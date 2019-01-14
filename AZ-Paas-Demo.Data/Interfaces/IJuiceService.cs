@@ -7,7 +7,7 @@ namespace AZ_Paas_Demo.Data.Interfaces
 {
     public interface IJuiceService
     {
-        List<Juices> GetAllJuices();
+        List<Juices> GetAllJuices(int storeId);
 
     }
 }

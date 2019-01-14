@@ -16,6 +16,8 @@ using AZ_Paas_Demo.Data.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using AZ_Paas_Demo.Data.Models;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace AZ_Paas_Demo
 {
@@ -32,6 +34,8 @@ namespace AZ_Paas_Demo
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<AzureAd>(Configuration.GetSection("AzureAd"));
+            services.Configure<ConnectionStrings>(Configuration.GetSection("ConnectionStrings"));
+
             services.AddDbContext<azpaasdemodbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("JuiceDBConnection")));
 
             //add Redis Cache Service
@@ -45,6 +49,8 @@ namespace AZ_Paas_Demo
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<IJuiceService, JuiceService>();
             services.AddTransient<IAccountService, AccountService>();
+            services.AddTransient<IRoutingService, RoutingService>();
+            services.AddTransient<IContextFactory, ContextFactory>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {

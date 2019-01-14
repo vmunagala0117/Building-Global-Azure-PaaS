@@ -9,20 +9,22 @@ namespace AZ_Paas_Demo.Data.Services
 {
     public class StoreService : IStoreService
     {
-        private azpaasdemodbContext _context;
-        public StoreService(azpaasdemodbContext context)
+        private IContextFactory _context;
+        public StoreService(IContextFactory context)
         {
             _context = context;
         }
 
+        /*
         public Stores GetDefaultStore()
         {
             return _context.Stores.FirstOrDefault();
         }
+        */
 
         public Stores GetStoreById(int storeId)
         {
-            return _context.Stores.Single(s => s.Id == storeId);
+            return _context.GetRoutedContext(storeId).Stores.Single(s => s.Id == storeId);
         }
     }
 }

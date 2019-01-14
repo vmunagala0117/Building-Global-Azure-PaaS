@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AZ_Paas_Demo.Data.Models
 {
@@ -11,7 +10,6 @@ namespace AZ_Paas_Demo.Data.Models
             OrderLines = new HashSet<OrderLines>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Name { get; set; }
         public string ImageUrl { get; set; }

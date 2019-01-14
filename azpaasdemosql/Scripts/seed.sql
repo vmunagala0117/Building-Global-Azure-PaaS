@@ -14,3 +14,16 @@ BEGIN
 	--INSERT INTO dbo.OrderLines([JuiceId], [OrderId], [Quantity]) VALUES(1,1,3)
 
 END
+
+IF NOT EXISTS(SELECT 1 FROM dbo.DatabaseServers)
+BEGIN
+	
+	INSERT INTO dbo.DatabaseServers ([DatabaseServer],[DatabaseName],[Region]) VALUES ('azpaasdemosqlservereastus.database.windows.net','azpaasdemo-db-eastus','US')
+	UPDATE dbo.Stores SET DatabaseServerId = @@IDENTITY WHERE Country = 'USA' 
+		
+	INSERT INTO dbo.DatabaseServers ([DatabaseServer],[DatabaseName],[Region]) VALUES ('azpaasdemosqlserversouthindia.database.windows.net','azpaasdemo-db-india','India')
+	UPDATE dbo.Stores SET DatabaseServerId = @@IDENTITY WHERE Country = 'India'
+
+	INSERT INTO dbo.DatabaseServers ([DatabaseServer],[DatabaseName],[Region]) VALUES ('azpaasdemosqlserveraustraliaeast.database.windows.net','azpaasdemo-db-aus','Australia')
+	UPDATE dbo.Stores SET DatabaseServerId = @@IDENTITY WHERE Country = 'Singapore'
+END

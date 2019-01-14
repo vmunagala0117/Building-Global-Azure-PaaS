@@ -8,6 +8,6 @@ namespace AZ_Paas_Demo.Data.Interfaces
     public interface IStoreService
     {
         Stores GetStoreById(int storeId);
-        Stores GetDefaultStore();
+        //Stores GetDefaultStore();
     }
 }

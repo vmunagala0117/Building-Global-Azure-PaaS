@@ -15,7 +15,9 @@ namespace AZ_Paas_Demo.Data.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Country { get; set; }
+        public int? DatabaseServerId { get; set; }
 
+        public DatabaseServers DatabaseServer { get; set; }
         public ICollection<Orders> Orders { get; set; }
     }
 }

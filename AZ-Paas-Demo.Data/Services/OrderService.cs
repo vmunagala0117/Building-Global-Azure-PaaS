@@ -11,10 +11,10 @@ namespace AZ_Paas_Demo.Data.Services
 {
     public class OrderService : IOrderService
     {
-        private azpaasdemodbContext _context;
+        private IContextFactory _context;
         private IStoreService _storeService;
 
-        public OrderService(azpaasdemodbContext context, IStoreService storeService)
+        public OrderService(IContextFactory context, IStoreService storeService)
         {
             _context = context;
             _storeService = storeService;
@@ -22,8 +22,9 @@ namespace AZ_Paas_Demo.Data.Services
 
         public void AddJuiceToOrder(int juiceId, int storeId)
         {
+            var dbContext = _context.GetRoutedContext(storeId);
             //get the existing order if any?
-            var storeOrder = _context.Orders
+            var storeOrder = dbContext.Orders
                 .Where(s => s.StoreId == storeId)
                 .Include(ol => ol.OrderLines)
                     .ThenInclude(ol => ol.Juice)
@@ -47,7 +48,7 @@ namespace AZ_Paas_Demo.Data.Services
                 //add a new order line item
                 if (!orderLineExists)
                 {
-                    var juice = _context.Juices.Where(c => c.Id == juiceId).FirstOrDefault();
+                    var juice = dbContext.Juices.Where(c => c.Id == juiceId).FirstOrDefault();
                     storeOrder.OrderLines.Add(new OrderLines
                     {
                         Juice = juice,
@@ -55,16 +56,16 @@ namespace AZ_Paas_Demo.Data.Services
                     });
                     storeOrder.Price += juice.Price;
                 }
-                _context.Orders.Update(storeOrder);
-                _context.SaveChanges();
+                dbContext.Orders.Update(storeOrder);
+                dbContext.SaveChanges();
             }
             else
             {
-                var juice = _context.Juices.Where(c => c.Id == juiceId).FirstOrDefault();
+                var juice = dbContext.Juices.Where(c => c.Id == juiceId).FirstOrDefault();
                 storeOrder = new Orders
                 {
                     Date = DateTimeOffset.Now,
-                    Store = _storeService.GetStoreById(storeId),
+                    //Store = _storeService.GetStoreById(storeId),
                     Status = "New",
                     StoreId = storeId
                 };
@@ -74,23 +75,24 @@ namespace AZ_Paas_Demo.Data.Services
                     Quantity = 1
                 });
                 storeOrder.Price = juice.Price;
-                _context.Orders.Add(storeOrder);
-                _context.SaveChanges();
+                dbContext.Orders.Add(storeOrder);
+                dbContext.SaveChanges();
             }
         }
         public void CancelOrder(int orderId, int storeId)
         {
-            var order = _context.Orders.Where(o => o.Id == orderId).FirstOrDefault();
+            var order = _context.GetRoutedContext(storeId).Orders.Where(o => o.Id == orderId).FirstOrDefault();
             if (order != null)
             {
-                _context.Remove(order);
-                _context.SaveChanges();
+                _context.GetRoutedContext(storeId).Remove(order);
+                _context.GetRoutedContext(storeId).SaveChanges();
             }
         }
 
         public List<Orders> GetAllOrders(int storeId)
         {
-            var orders = _context.Orders.Where(s => s.StoreId == storeId)
+            var dbContext = _context.GetRoutedContext(storeId);
+            var orders = dbContext.Orders.Where(s => s.StoreId == storeId)
                 .Include(o => o.OrderLines)
                 .Include(o => o.Store)
                 .ToList();
@@ -100,7 +102,7 @@ namespace AZ_Paas_Demo.Data.Services
         public Orders GetOrderById(int orderId, int storeId)
         {
             //.Include is Eager loading
-            var order = _context.Orders
+            var order = _context.GetRoutedContext(storeId).Orders
                 .Where(s => s.StoreId == storeId && s.Id == orderId)
                 .Include(ol => ol.OrderLines)
                     .ThenInclude(ol => ol.Juice)//including OrderLine property explicitly.
@@ -109,9 +111,9 @@ namespace AZ_Paas_Demo.Data.Services
             return order;
         }
 
-        public void PlaceOrder(int orderId)
+        public void PlaceOrder(int orderId, int storeId)
         {
-            var order = _context.Orders
+            var order = _context.GetRoutedContext(storeId).Orders
                                 .Where(o => o.Id == orderId)
                                 .Include(ol => ol.OrderLines).ThenInclude(ol => ol.Juice)
                                 .Include(o => o.Store)
@@ -121,16 +123,16 @@ namespace AZ_Paas_Demo.Data.Services
                 foreach (var line in order.OrderLines)
                 {
                     //have to get a reference to the actual juice, not the attached one, otherwise EF will protest
-                    line.Juice = _context.Juices.Where(c => c.Id == line.Juice.Id).FirstOrDefault();
+                    line.Juice = _context.GetRoutedContext(storeId).Juices.Where(c => c.Id == line.Juice.Id).FirstOrDefault();
                 }
                 order.Status = "Placed";
 
                 //have to get a reference to the actual store, not the attached one, otherwise EF will protest
-                order.Store = _context.Stores.Where(s => s.Id == order.Store.Id).FirstOrDefault();
+                order.Store = _context.GetRoutedContext(storeId).Stores.Where(s => s.Id == order.Store.Id).FirstOrDefault();
 
                 //Update status
-                _context.Orders.Update(order);
-                if (_context.SaveChanges() > 0) //check for success
+                _context.GetRoutedContext(storeId).Orders.Update(order);
+                if (_context.GetRoutedContext(storeId).SaveChanges() > 0) //check for success
                 {
                     //if all went well, remove the item from cache
                 }

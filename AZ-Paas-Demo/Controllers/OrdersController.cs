@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace AZ_Paas_Demo.Controllers
 {
@@ -16,21 +17,22 @@ namespace AZ_Paas_Demo.Controllers
     {
         private IOrderService _orderService;
         private IDistributedCache _cache;
-        private int _storeId;
+        public int _storeId { get; set; }
         public OrdersController(IOrderService orderService, IDistributedCache cache)
         {
             _orderService = orderService;
             _cache = cache;
         }
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            _storeId = int.Parse(_cache.GetString(User.Identity.Name));
+            base.OnActionExecuting(context);
+        }
         public IActionResult Index()
         {
             List<Orders> orders = new List<Orders>();
-            if (int.TryParse(_cache.GetString(User.Identity.Name), out _storeId))
-            {
-                orders = _orderService.GetAllOrders(_storeId);
-            }
+            orders = _orderService.GetAllOrders(_storeId);
             return View(orders);
-
         }
         public IActionResult Detail(int id)
         {
@@ -44,7 +46,7 @@ namespace AZ_Paas_Demo.Controllers
         }
         public IActionResult PlaceOrder(int id)
         {
-            _orderService.PlaceOrder(id);
+            _orderService.PlaceOrder(id, _storeId);
             return RedirectToAction("Index");
         }
         public IActionResult AddJuiceToOrderLine(int juiceId)

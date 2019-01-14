@@ -11,14 +11,14 @@ namespace AZ_Paas_Demo.Data.Services
 {
     public class JuiceService : IJuiceService
     {
-        private azpaasdemodbContext _context;
+        private IContextFactory _context;
         private IDistributedCache _cache;
-        public JuiceService(azpaasdemodbContext context, IDistributedCache cache)
+        public JuiceService(IContextFactory context, IDistributedCache cache)
         {
             _context = context;
             _cache = cache;
         }
-        public List<Juices> GetAllJuices()
+        public List<Juices> GetAllJuices(int storeId)
         {
             List<Juices> juices;
             //get the juices details from the cache
@@ -30,7 +30,7 @@ namespace AZ_Paas_Demo.Data.Services
             else
             {
                 // no juices, get it from the database
-                juices = _context.Juices.ToList();
+                juices = _context.GetRoutedContext(2).Juices.ToList();
                 _cache.SetString("juices", JsonConvert.SerializeObject(juices));
             }
             return juices;
