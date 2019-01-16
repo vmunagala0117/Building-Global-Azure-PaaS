@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using AZ_Paas_Demo.Data.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace AZ_Paas_Demo
 {
@@ -51,6 +52,7 @@ namespace AZ_Paas_Demo
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IRoutingService, RoutingService>();
             services.AddTransient<IContextFactory, ContextFactory>();
+            services.AddTransient<IQueueService, QueueService>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -75,6 +77,18 @@ namespace AZ_Paas_Demo
                 options.ClientId = Configuration["AzureAd:ClientId"];
                 options.CallbackPath = Configuration["AzureAd:AuthCallback"];
             });
+
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "Juice Store User API",
+                    Description = "A simple api to add a new user for a new juice store",
+                    TermsOfService = "None"
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -93,6 +107,11 @@ namespace AZ_Paas_Demo
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Juice Store User API");
+            });
 
             app.UseMvc(routes =>
             {

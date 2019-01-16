@@ -16,10 +16,11 @@ namespace AZ_Paas_Demo.Data.Services
     public class AccountService : IAccountService
     {
         private AzureAd _adSettings;
-
-        public AccountService(IOptions<AzureAd> adSettings)
+        private IQueueService _queueService;
+        public AccountService(IOptions<AzureAd> adSettings, IQueueService queueService)
         {
             _adSettings = adSettings.Value;
+            _queueService = queueService;
         }
 
         public async Task<int> GetStoreIdFromUser(string userId)
@@ -47,7 +48,7 @@ namespace AZ_Paas_Demo.Data.Services
 
         private string GetUserUrl(string userPrincipalName)
         {
-            return string.Format("https://graph.microsoft.com/v1.0/users/{0}", userPrincipalName);        
+            return string.Format("https://graph.microsoft.com/v1.0/users/{0}", userPrincipalName);
         }
 
         private async Task<string> GetBearerAccesToken()
@@ -69,5 +70,57 @@ namespace AZ_Paas_Demo.Data.Services
             return result;
         }
 
+        public void RegisterNewStoreAndUser(Register storeUserData)
+        {
+            //call queue service
+            _queueService.QueueNewStoreCreation(JsonConvert.SerializeObject(storeUserData));
+        }
+
+        public async Task<string> CreateNewUser(Register userInfo, string storeId)
+        {
+            string result = string.Empty;
+            string accessToken = await GetBearerAccesToken();
+            using (var client = new HttpClient())
+            {
+                using (var request = new HttpRequestMessage(HttpMethod.Post, "https://graph.microsoft.com/v1.0/users"))
+                {
+                    var newUser = CreateNewUserObject(userInfo, storeId);
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                    request.Content = new StringContent(newUser.ToString(), Encoding.UTF8, "application/json");
+
+                    result = userInfo.PersonEmail;
+                    using (var response = await client.SendAsync(request))
+                    {
+                        if (response.StatusCode != HttpStatusCode.Created)
+                        {
+                            result = await response.Content.ReadAsStringAsync();
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        private JObject CreateNewUserObject(Register userInfo, string storeId)
+        {
+            //https://docs.microsoft.com/en-us/graph/api/user-post-users?view=graph-rest-1.0
+            JObject newUserJson = new JObject(
+                                        new JProperty("accountEnabled", true),
+                                        new JProperty("displayName", string.Format("{0} {1}", userInfo.PersonFirstName, userInfo.PersonLastName)),
+                                        new JProperty("mailNickname", string.Format("{0} {1}", userInfo.PersonFirstName, userInfo.PersonLastName)),
+                                        new JProperty("passwordProfile",
+                                                            new JObject(
+                                                                new JProperty("forceChangePasswordNextSignIn", true),
+                                                                new JProperty("password", "p@ssword1")
+                                                                )
+                                                      ),
+                                        new JProperty("userPrincipalName", userInfo.PersonEmail),
+                                        new JProperty("physicalDeliveryOfficeName ", storeId)
+                                        );
+
+            return newUserJson;
+
+        }
+                
     }
 }

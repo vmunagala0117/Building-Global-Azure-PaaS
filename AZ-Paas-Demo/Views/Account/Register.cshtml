@@ -1,0 +1,79 @@
+﻿@model AZ_Paas_Demo.Data.Models.Register
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<hr />
+
+<form asp-controller="Account" asp-action="Register" method="post" class="form-horizontal">
+    <h4>Create a new Juice store account</h4>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="StoreName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="StoreName" class="form-control" />
+            <span asp-validation-for="StoreName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="StoreCountry" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="StoreCountry" class="form-control" />
+            <span asp-validation-for="StoreCountry" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="StoreDataRegions" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <select asp-for="StoreDataRegions" class="form-control">
+                <option value="USA">East USA</option>
+                <option value="India">South India</option>
+                <option value="Aus">Australia East</option>
+
+            </select>
+            <span asp-validation-for="StoreDataRegions" class="text-danger"></span>
+        </div>
+    </div>
+    <hr />
+
+    <div class="form-group">
+        <label asp-for="PersonEmail" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="PersonEmail" class="form-control" />
+            <span asp-validation-for="PersonEmail" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="PersonFirstName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="PersonFirstName" class="form-control" />
+            <span asp-validation-for="PersonFirstName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="PersonLastName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="PersonLastName" class="form-control" />
+            <span asp-validation-for="PersonLastName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-default" />
+    </div>
+</form>
+
+@section Scripts{
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.17.0/jquery.validate.min.js"
+            asp-fallback-src="~/lib/jquery-validation/dist/jquery.validate.min.js"
+            asp-fallback-test="window.jQuery && window.jQuery.validator">
+    </script>
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validation.unobtrusive/3.2.6/jquery.validate.unobtrusive.min.js"
+            asp-fallback-src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"
+            asp-fallback-test="window.jQuery && window.jQuery.validator && window.jQuery.validator.unobtrusive">
+    </script>
+}
+
