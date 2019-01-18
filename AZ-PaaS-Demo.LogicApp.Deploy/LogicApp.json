@@ -1,0 +1,387 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "logicAppName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "metadata": {
+        "description": "Name of the Logic App."
+      }
+    },
+    "logicAppLocation": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "allowedValues": [
+        "[resourceGroup().location]",
+        "eastasia",
+        "southeastasia",
+        "centralus",
+        "eastus",
+        "eastus2",
+        "westus",
+        "northcentralus",
+        "southcentralus",
+        "northeurope",
+        "westeurope",
+        "japanwest",
+        "japaneast",
+        "brazilsouth",
+        "australiaeast",
+        "australiasoutheast",
+        "southindia",
+        "centralindia",
+        "westindia",
+        "canadacentral",
+        "canadaeast",
+        "uksouth",
+        "ukwest",
+        "westcentralus",
+        "westus2"
+      ],
+      "metadata": {
+        "description": "Location of the Logic App."
+      }
+    },
+    "sql_1_Connection_Name": {
+      "type": "string",
+      "defaultValue": "sql"
+    },
+    "sql_1_Connection_DisplayName": {
+      "type": "string",
+      "defaultValue": "JuiceConnectionDB"
+    },
+    "sql_1_server": {
+      "type": "string",
+      "metadata": {
+        "description": "SQL server name"
+      },
+      "defaultValue": "azpaasdemosqlservereastus.database.windows.net"
+    },
+    "sql_1_database": {
+      "type": "string",
+      "metadata": {
+        "description": "SQL database name"
+      },
+      "defaultValue": "azpaasdemo-db-eastus"
+    },
+    "sql_1_username": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Username credential"
+      }
+    },
+    "sql_1_password": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password credential"
+      }
+    },
+    "sql_1_sqlConnectionString": {
+      "type": "securestring",
+      "metadata": {
+        "description": "SQL Connection String"
+      }
+    },
+    "azurequeues_1_Connection_Name": {
+      "type": "string",
+      "defaultValue": "azurequeues"
+    },
+    "azurequeues_1_Connection_DisplayName": {
+      "type": "string",
+      "defaultValue": "PaasDemoStorageConnection"
+    },
+    "azurequeues_1_storageaccount": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of your storage account"
+      },
+      "defaultValue": "paasdemostorageacct"
+    },
+    "azurequeues_1_sharedkey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The shared storage key of your storage account"
+      }
+    },
+    "outlook_1_Connection_Name": {
+      "type": "string",
+      "defaultValue": "outlook"
+    },
+    "outlook_1_Connection_DisplayName": {
+      "type": "string",
+      "defaultValue": "vamsi.munagala@hotmail.com"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "name": "[parameters('logicAppName')]",
+      "type": "Microsoft.Logic/workflows",
+      "location": "[parameters('logicAppLocation')]",
+      "tags": {
+        "displayName": "LogicApp"
+      },
+      "apiVersion": "2016-06-01",
+      "properties": {
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "actions": {
+            "Get_rows": {
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['sql']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/datasets/default/tables/@{encodeURIComponent(encodeURIComponent('[dbo].[DatabaseServers]'))}/items",
+                "queries": {
+                  "$filter": "Region eq@{json(triggerBody()?['MessageText']).StoreDataRegions} "
+                }
+              },
+              "runAfter": {}
+            },
+            "For_each": {
+              "type": "Foreach",
+              "foreach": "@body('Get_rows')?['value']",
+              "actions": {
+                "Insert_row": {
+                  "type": "ApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connection": {
+                        "name": "@parameters('$connections')['sql']['connectionId']"
+                      }
+                    },
+                    "method": "post",
+                    "body": {
+                      "Name": "@{json(triggerBody()?['MessageText']).StoreName}",
+                      "Country": "@{json(triggerBody()?['MessageText']).StoreCountry}",
+                      "DatabaseServerId": "@items('For_each')?['Id']"
+                    },
+                    "path": "/datasets/default/tables/@{encodeURIComponent(encodeURIComponent('[dbo].[Stores]'))}/items"
+                  },
+                  "runAfter": {}
+                }
+              },
+              "runAfter": {
+                "Get_rows": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "For_each_2": {
+              "type": "Foreach",
+              "foreach": "@body('Get_rows')?['value']",
+              "actions": {
+                "HTTP": {
+                  "type": "Http",
+                  "inputs": {
+                    "method": "POST",
+                    "uri": "https://www.vpaasdemo.com/api/User?storeId=@{items('For_each_2')?['Id']}",
+                    "body": "@json(triggerBody()?['MessageText'])",
+                    "authentication": {
+                      "type": "ActiveDirectoryOAuth",
+                      "tenant": "3328749f-8c64-4a61-b894-1b71c5db0422",
+                      "audience": "https://management.core.windows.net/",
+                      "clientId": "d7af69a6-0495-400d-ab25-39319b8c498b",
+                      "secret": "2v0oIuSjb7OOtrKKXy02oK86sFgP5d+ZhQmFora25qg="
+                    }
+                  },
+                  "runAfter": {}
+                },
+                "Condition": {
+                  "type": "If",
+                  "expression": {
+                    "and": [
+                      {
+                        "contains": [
+                          "@body('HTTP')",
+                          "@"
+                        ]
+                      }
+                    ]
+                  },
+                  "actions": {
+                    "Send_an_email": {
+                      "type": "ApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connection": {
+                            "name": "@parameters('$connections')['outlook']['connectionId']"
+                          }
+                        },
+                        "method": "post",
+                        "body": {
+                          "To": "@{json(triggerBody()?['MessageText']).PersonEmail}",
+                          "Subject": "New user account has been created for you",
+                          "Body": "Hi\nYou new account is:\nUser: @{body('HTTP')}\n\nPassword: p@ssword1",
+                          "Cc": "vamsi.munagala@hotmailcom"
+                        },
+                        "path": "/Mail"
+                      },
+                      "runAfter": {}
+                    }
+                  },
+                  "runAfter": {
+                    "HTTP": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              },
+              "runAfter": {
+                "For_each": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "HTTP_2": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "https://vpaasdemo.com/api/Route",
+                "authentication": {
+                  "type": "ActiveDirectoryOAuth",
+                  "tenant": "3328749f-8c64-4a61-b894-1b71c5db0422",
+                  "audience": "https://management.core.windows.net/",
+                  "clientId": "d7af69a6-0495-400d-ab25-39319b8c498b",
+                  "secret": "2v0oIuSjb7OOtrKKXy02oK86sFgP5d+ZhQmFora25qg="
+                }
+              },
+              "runAfter": {
+                "For_each_2": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Delete_message": {
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azurequeues']['connectionId']"
+                  }
+                },
+                "method": "delete",
+                "path": "/@{encodeURIComponent('myqueue')}/messages/@{encodeURIComponent(triggerBody()?['MessageId'])}",
+                "queries": {
+                  "popreceipt": "@triggerBody()?['PopReceipt']"
+                }
+              },
+              "runAfter": {
+                "HTTP_2": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            }
+          },
+          "triggers": {
+            "When_there_are_messages_in_a_queue": {
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azurequeues']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/@{encodeURIComponent('myqueue')}/message_trigger"
+              },
+              "recurrence": {
+                "frequency": "Minute",
+                "interval": 1
+              },
+              "splitOn": "@triggerBody()?['QueueMessagesList']?['QueueMessage']"
+            }
+          },
+          "contentVersion": "1.0.0.0",
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "sql": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'sql')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('sql_1_Connection_Name'))]",
+                "connectionName": "[parameters('sql_1_Connection_Name')]"
+              },
+              "outlook": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'outlook')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('outlook_1_Connection_Name'))]",
+                "connectionName": "[parameters('outlook_1_Connection_Name')]"
+              },
+              "azurequeues": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'azurequeues')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('azurequeues_1_Connection_Name'))]",
+                "connectionName": "[parameters('azurequeues_1_Connection_Name')]"
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', parameters('sql_1_Connection_Name'))]",
+        "[resourceId('Microsoft.Web/connections', parameters('outlook_1_Connection_Name'))]",
+        "[resourceId('Microsoft.Web/connections', parameters('azurequeues_1_Connection_Name'))]"
+      ]
+    },
+    {
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2016-06-01",
+      "name": "[parameters('sql_1_Connection_Name')]",
+      "location": "[parameters('logicAppLocation')]",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'sql')]"
+        },
+        "displayName": "[parameters('sql_1_Connection_DisplayName')]",
+        "parameterValues": {
+          "server": "[parameters('sql_1_server')]",
+          "database": "[parameters('sql_1_database')]",
+          "username": "[parameters('sql_1_username')]",
+          "password": "[parameters('sql_1_password')]",
+          "sqlConnectionString": "[parameters('sql_1_sqlConnectionString')]"
+        }
+      }
+    },
+    {
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2016-06-01",
+      "name": "[parameters('azurequeues_1_Connection_Name')]",
+      "location": "[parameters('logicAppLocation')]",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'azurequeues')]"
+        },
+        "displayName": "[parameters('azurequeues_1_Connection_DisplayName')]",
+        "parameterValues": {
+          "storageaccount": "[parameters('azurequeues_1_storageaccount')]",
+          "sharedkey": "[parameters('azurequeues_1_sharedkey')]"
+        }
+      }
+    },
+    {
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2016-06-01",
+      "name": "[parameters('outlook_1_Connection_Name')]",
+      "location": "[parameters('logicAppLocation')]",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'outlook')]"
+        },
+        "displayName": "[parameters('outlook_1_Connection_DisplayName')]"
+      }
+    }
+  ],
+  "outputs": {}
+}

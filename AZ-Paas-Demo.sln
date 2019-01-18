@@ -9,7 +9,9 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "azpaasdemosql", "azpaasdemo
 EndProject
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "AZ-Pass-Demo.Deploy", "AZ-Pass-Demo.Deploy\AZ-Pass-Demo.Deploy.deployproj", "{08AB5646-FE8D-40F9-BDA0-20EA9B66BB07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AZ-Paas-Demo.Data", "AZ-Paas-Demo.Data\AZ-Paas-Demo.Data.csproj", "{E3EDEEBC-A5FE-47A1-90B2-DFF693037D8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AZ-Paas-Demo.Data", "AZ-Paas-Demo.Data\AZ-Paas-Demo.Data.csproj", "{E3EDEEBC-A5FE-47A1-90B2-DFF693037D8B}"
+EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "AZ-PaaS-Demo.LogicApp.Deploy", "AZ-PaaS-Demo.LogicApp.Deploy\AZ-PaaS-Demo.LogicApp.Deploy.deployproj", "{C7EB29E0-56E6-4B31-A349-73F64E02309B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{E3EDEEBC-A5FE-47A1-90B2-DFF693037D8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3EDEEBC-A5FE-47A1-90B2-DFF693037D8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3EDEEBC-A5FE-47A1-90B2-DFF693037D8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7EB29E0-56E6-4B31-A349-73F64E02309B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7EB29E0-56E6-4B31-A349-73F64E02309B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7EB29E0-56E6-4B31-A349-73F64E02309B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7EB29E0-56E6-4B31-A349-73F64E02309B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
