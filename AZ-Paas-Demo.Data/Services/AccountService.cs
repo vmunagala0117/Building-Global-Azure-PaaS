@@ -76,6 +76,7 @@ namespace AZ_Paas_Demo.Data.Services
             _queueService.QueueNewStoreCreation(JsonConvert.SerializeObject(storeUserData));
         }
 
+        //https://docs.microsoft.com/en-us/graph/api/user-post-users?view=graph-rest-1.0
         public async Task<string> CreateNewUser(Register userInfo, string storeId)
         {
             string result = string.Empty;
@@ -103,11 +104,23 @@ namespace AZ_Paas_Demo.Data.Services
 
         private JObject CreateNewUserObject(Register userInfo, string storeId)
         {
-            //https://docs.microsoft.com/en-us/graph/api/user-post-users?view=graph-rest-1.0
+            /*
+             * {
+                  "accountEnabled": true,
+                  "displayName": "Abc Test",
+                  "mailNickname": "AbcTest",
+                  "passwordProfile": {
+                    "forceChangePasswordNextSignIn": true,
+                    "password": "p@ssword1"
+                  },
+                  "userPrincipalName": "abc@vamsimunagalahotmail.onmicrosoft.com",
+                  "officeLocation": "1"
+                }
+             */
             JObject newUserJson = new JObject(
                                         new JProperty("accountEnabled", true),
                                         new JProperty("displayName", string.Format("{0} {1}", userInfo.PersonFirstName, userInfo.PersonLastName)),
-                                        new JProperty("mailNickname", string.Format("{0} {1}", userInfo.PersonFirstName, userInfo.PersonLastName)),
+                                        new JProperty("mailNickname", string.Format("{0}{1}", userInfo.PersonFirstName, userInfo.PersonLastName)),
                                         new JProperty("passwordProfile",
                                                             new JObject(
                                                                 new JProperty("forceChangePasswordNextSignIn", true),
@@ -115,11 +128,10 @@ namespace AZ_Paas_Demo.Data.Services
                                                                 )
                                                       ),
                                         new JProperty("userPrincipalName", userInfo.PersonEmail),
-                                        new JProperty("physicalDeliveryOfficeName ", storeId)
+                                        new JProperty("officeLocation", storeId)
                                         );
 
             return newUserJson;
-
         }
                 
     }

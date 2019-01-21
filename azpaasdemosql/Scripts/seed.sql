@@ -7,7 +7,7 @@ BEGIN
 
 	INSERT INTO dbo.Stores ([Name], [Country]) VALUES ('VV Stores', 'USA')
 	INSERT INTO dbo.Stores ([Name], [Country]) VALUES ('Sippy Juice Stores', 'India')
-	INSERT INTO dbo.Stores ([Name], [Country]) VALUES ('Green Juice Stores', 'Singapore')
+	INSERT INTO dbo.Stores ([Name], [Country]) VALUES ('Green Juice Stores', 'Australia')
 
 	--INSERT INTO dbo.Orders([Date],[Price],[StoreId]) VALUES('2018-01-12', 20, 1)
 
@@ -25,5 +25,5 @@ BEGIN
 	UPDATE dbo.Stores SET DatabaseServerId = @@IDENTITY WHERE Country = 'India'
 
 	INSERT INTO dbo.DatabaseServers ([DatabaseServer],[DatabaseName],[Region]) VALUES ('azpaasdemosqlserveraustraliaeast.database.windows.net','azpaasdemo-db-aus','Australia')
-	UPDATE dbo.Stores SET DatabaseServerId = @@IDENTITY WHERE Country = 'Singapore'
+	UPDATE dbo.Stores SET DatabaseServerId = @@IDENTITY WHERE Country = 'Australia'
 END

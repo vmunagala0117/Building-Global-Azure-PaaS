@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AZ_Paas_Demo.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RouteController : ControllerBase

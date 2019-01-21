@@ -78,12 +78,6 @@
         "description": "Password credential"
       }
     },
-    "sql_1_sqlConnectionString": {
-      "type": "securestring",
-      "metadata": {
-        "description": "SQL Connection String"
-      }
-    },
     "azurequeues_1_Connection_Name": {
       "type": "string",
       "defaultValue": "azurequeues"
@@ -139,7 +133,7 @@
                 "method": "get",
                 "path": "/datasets/default/tables/@{encodeURIComponent(encodeURIComponent('[dbo].[DatabaseServers]'))}/items",
                 "queries": {
-                  "$filter": "Region eq@{json(triggerBody()?['MessageText']).StoreDataRegions} "
+                  "$filter": "Region eq '@{json(triggerBody()?['MessageText']).StoreDataRegions}'"
                 }
               },
               "runAfter": {}
@@ -186,9 +180,9 @@
                     "authentication": {
                       "type": "ActiveDirectoryOAuth",
                       "tenant": "3328749f-8c64-4a61-b894-1b71c5db0422",
-                      "audience": "https://management.core.windows.net/",
-                      "clientId": "d7af69a6-0495-400d-ab25-39319b8c498b",
-                      "secret": "2v0oIuSjb7OOtrKKXy02oK86sFgP5d+ZhQmFora25qg="
+                      "audience": "d7af69a6-0495-400d-ab25-39319b8c498b",
+                      "clientId": "95c38117-6c11-4909-ac2f-04d80d170c0c",
+                      "secret": "6vifcyJge6pbHhiaipLOTs5NpBFdRz75xhU+S99ZGKw="
                     }
                   },
                   "runAfter": {}
@@ -243,13 +237,13 @@
               "type": "Http",
               "inputs": {
                 "method": "GET",
-                "uri": "https://vpaasdemo.com/api/Route",
+                "uri": "https://www.vpaasdemo.com/api/Route",
                 "authentication": {
                   "type": "ActiveDirectoryOAuth",
                   "tenant": "3328749f-8c64-4a61-b894-1b71c5db0422",
-                  "audience": "https://management.core.windows.net/",
-                  "clientId": "d7af69a6-0495-400d-ab25-39319b8c498b",
-                  "secret": "2v0oIuSjb7OOtrKKXy02oK86sFgP5d+ZhQmFora25qg="
+                  "audience": "d7af69a6-0495-400d-ab25-39319b8c498b",
+                  "clientId": "95c38117-6c11-4909-ac2f-04d80d170c0c",
+                  "secret": "6vifcyJge6pbHhiaipLOTs5NpBFdRz75xhU+S99ZGKw="
                 }
               },
               "runAfter": {
@@ -349,8 +343,7 @@
           "server": "[parameters('sql_1_server')]",
           "database": "[parameters('sql_1_database')]",
           "username": "[parameters('sql_1_username')]",
-          "password": "[parameters('sql_1_password')]",
-          "sqlConnectionString": "[parameters('sql_1_sqlConnectionString')]"
+          "password": "[parameters('sql_1_password')]"
         }
       }
     },
